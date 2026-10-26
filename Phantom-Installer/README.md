@@ -86,3 +86,112 @@ The investigation was performed as an authorized CyberDefenders Blue Team traini
 
 ---
 
+
+## Forensic Evidence and Technical Findings
+
+### 1. Suspicious Installer Investigation
+
+The investigation began by examining a suspicious software installer obtained from an unofficial distribution source.
+
+The analysis focused on:
+
+- Identifying the downloaded executable.
+- Reviewing file metadata and digital signature information.
+- Examining configuration files associated with the installer.
+- Investigating how a legitimate application could be abused to execute unauthorized code.
+
+**Security Finding:** A valid digital signature does not guarantee that every component or configuration associated with an application is safe.
+
+### 2. File Metadata Analysis
+
+FTK Imager was used to examine suspicious executable files and their filesystem metadata.
+
+The investigation included reviewing:
+
+- File names and extensions.
+- File sizes.
+- Creation, modification, and access timestamps.
+- Related executable artifacts.
+
+These findings helped establish relationships between suspicious files and identify events requiring further investigation.
+
+**Analyst Note:** Filesystem timestamps should be correlated with other evidence because they may be affected by file operations, system configuration, or timestamp manipulation.
+
+### 3. Windows Execution Artifact Analysis
+
+Windows execution artifacts were examined to determine whether suspicious programs had executed.
+
+The investigation included analyzing execution-related records using forensic tools such as PECmd and Timeline Explorer.
+
+The analysis focused on:
+
+- Identifying program execution evidence.
+- Reviewing execution counts where available.
+- Correlating execution records with filesystem events.
+- Establishing a sequence of suspicious activity.
+
+**Security Finding:** Execution artifacts can help establish that a program was launched, but additional evidence is needed to determine its full behavior.
+
+### 4. Filesystem Timeline Reconstruction
+
+MFTECmd was used to process NTFS filesystem metadata and generate structured output for analysis.
+
+The resulting dataset contained hundreds of thousands of records.
+
+Timeline Explorer was used to review and filter these records to identify relevant filesystem events.
+
+The investigation demonstrated how timeline analysis can help analysts reconstruct suspicious activity from large forensic datasets.
+
+### 5. Executable and Configuration Analysis
+
+Detect It Easy and dnSpy were used to investigate executable characteristics and managed-code behavior.
+
+The analysis examined how application configuration and assembly-loading mechanisms could influence program execution.
+
+The investigation also explored the security implications of application execution hijacking.
+
+**Security Finding:** Attackers may abuse legitimate application components or configuration mechanisms to execute unauthorized code.
+
+### 6. Persistence and Command-and-Control Analysis
+
+The investigation examined mechanisms that could allow malicious activity to continue after initial execution.
+
+Areas investigated included:
+
+- Scheduled-task modification.
+- Abuse of legitimate application update mechanisms.
+- Suspicious executable execution.
+- Embedded payload behavior.
+- Potential command-and-control activity.
+
+The findings were evaluated using available forensic artifacts and execution records.
+
+No live command-and-control network capture is included in this report.
+
+### 7. Anti-Forensics and Destructive Activity
+
+The investigation examined suspicious behavior associated with attempts to interfere with recovery and forensic analysis.
+
+Areas investigated included:
+
+- Attempts to delete Windows volume shadow copies.
+- Attempts to clear Windows event logs.
+- Destructive payload behavior.
+- Filesystem evidence associated with suspicious activity.
+
+**Security Finding:** Attempts to remove recovery data or clear security logs can indicate efforts to disrupt system recovery, conceal activity, or reduce forensic visibility.
+
+### 8. Evidence Limitations
+
+This report summarizes investigative techniques and findings from a completed CyberDefenders training exercise.
+
+The original investigation environment is no longer available for additional evidence collection.
+
+The repository contains completion evidence but does not include a complete forensic evidence package.
+
+To respect the CyberDefenders policy for active labs, challenge-specific answers, exact indicators, and detailed solution steps have been intentionally omitted.
+
+No malicious executables, disk images, or proprietary challenge materials are distributed through this repository.
+
+---
+
