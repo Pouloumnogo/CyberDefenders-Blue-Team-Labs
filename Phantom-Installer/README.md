@@ -80,7 +80,7 @@ The investigation was performed as an authorized CyberDefenders Blue Team traini
 
 ### Lab Completion
 
-![CyberDefenders Phantom Installer Lab Completion](phantom-installer-lab-completion.png)
+![Phantom Installer Lab Completion](Screenshots/phantom-installer-lab-completion.png)
 
 *Evidence of completed CyberDefenders Phantom Installer investigation.*
 
@@ -195,8 +195,6 @@ No malicious executables, disk images, or proprietary challenge materials are di
 
 ---
 
-
----
 
 ## Investigation Findings and Security Recommendations
 
