@@ -195,3 +195,44 @@ No malicious executables, disk images, or proprietary challenge materials are di
 
 ---
 
+
+---
+
+## Investigation Findings and Security Recommendations
+
+### Investigation Summary
+
+Completed the CyberDefenders Phantom Installer blue team investigation, achieving 100% completion (15/15 questions, 25/25 points).
+
+The investigation involved examining suspicious Windows executables, reviewing forensic artifacts, reconstructing a filesystem timeline, and analyzing techniques associated with malicious software execution, persistence, command-and-control activity, and destructive behavior.
+
+### Technical Skills Demonstrated
+
+- **Digital Forensics:** Examined Windows filesystem metadata and execution artifacts.
+- **Malware Analysis:** Investigated suspicious executable characteristics using Detect It Easy and dnSpy.
+- **Timeline Analysis:** Used MFTECmd and Timeline Explorer to correlate filesystem events.
+- **Threat Investigation:** Analyzed potential persistence mechanisms and command-and-control activity.
+- **Incident Response:** Interpreted forensic findings and developed defensive recommendations.
+
+### Security Recommendations
+
+1. Download and install software only from trusted, verified sources.
+2. Implement application allowlisting where appropriate.
+3. Monitor unusual scheduled task creation and modification.
+4. Collect and centralize Windows security and endpoint telemetry.
+5. Investigate suspicious executable activity and unexpected outbound connections.
+6. Maintain protected, tested backups and restrict unauthorized changes to recovery mechanisms.
+
+### Evidence and Limitations
+
+The original forensic environment is no longer available for additional evidence collection.
+
+This repository provides a summary of the investigative methodology and skills demonstrated. Detailed challenge questions, answers, and malicious samples are intentionally excluded in accordance with CyberDefenders' active-lab writeup restrictions.
+
+### Lab Outcome
+
+**Status:** Completed  
+**Score:** 25/25 points  
+**Completion:** 100%
+
+---
