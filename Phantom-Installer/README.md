@@ -236,3 +236,26 @@ This repository provides a summary of the investigative methodology and skills d
 **Completion:** 100%
 
 ---
+
+## Investigation Screenshots
+
+### 1. Initial Access
+![Initial Access](Screenshots/initial-access.png)
+
+### 2. Execution and AppDomain Hijacking
+![Execution and Hijacking Part 1](Screenshots/execution-hijacking-part1.png)
+
+![Execution and Hijacking Part 2](Screenshots/execution-hijacking-part2.png)
+
+### 3. Persistence and Command-and-Control (C2)
+![Persistence and C2 Part 1](Screenshots/persistence-c2-part1.png)
+
+![Persistence and C2 Part 2](Screenshots/persistence-c2-part2.png)
+
+### 4. Anti-Forensics and Destruction
+![Anti-Forensics Part 1](Screenshots/anti-forensics-part1.png)
+
+![Anti-Forensics Part 2](Screenshots/anti-forensics-part2.png)
+
+### 5. Lab Completion
+![Phantom Installer Lab Completion](Screenshots/phantom-installer-lab-completion.png)
