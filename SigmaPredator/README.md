@@ -862,3 +862,237 @@ This investigation provided hands-on experience in:
 - Cybersecurity Investigation Documentation
 
 **Question 8 Status:** Completed Answer accepted by CyberDefenders.
+
+
+### Question 9 Windows Event Log Clearing Detection Using Sigma and Chainsaw
+
+**Objective:** Develop and validate a Sigma detection rule to identify Windows event log clearing activity using native Windows event records and determine the earliest matching timestamp from historical EVTX logs.
+
+#### 1. Investigation Overview
+
+This investigation focused on identifying Windows event log clearing activity through native Windows event telemetry.
+
+Unlike Question 7, which analyzed PowerShell Script Block Logging, and Question 8, which examined Sysmon process creation events, Question 9 focused on event records generated when Windows event logs are cleared.
+
+These events can provide valuable evidence of potential defense evasion.
+
+**Tools and Technologies:**
+
+- Sigma — Detection rule development
+- Chainsaw — Sigma rule validation and historical EVTX analysis
+- Windows Event Logs — Security and System event monitoring
+- PowerShell — Execution of analysis commands
+- MITRE ATT&CK — Adversary technique research
+
+**Relevant Windows Event IDs:**
+
+| Event ID | Description |
+|---|---|
+| 104 | A Windows event log was cleared |
+| 1102 | The Security audit log was cleared |
+
+**MITRE ATT&CK:** T1070.001 — Clear Windows Event Logs (identifier used in the SigmaPredator lab).
+
+---
+
+#### 2. Sigma Rule Development
+
+A custom Sigma detection rule was created to identify Windows event log clearing activity.
+
+**Rule Filename:** `windows-event-log-clearing.yml`
+
+**Sigma Detection Rule:**
+
+```yaml
+title: Windows Event Log Clearing Detected
+status: experimental
+description: Detects native Windows events indicating event log clearing.
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+
+detection:
+  selection:
+    EventID:
+      - 104
+      - 1102
+  condition: selection
+
+falsepositives:
+  - Authorized administrative log maintenance
+
+level: high
+```
+
+**Detection Logic Explanation:**
+
+The rule monitors Windows event records associated with event log clearing.
+
+- `logsource` identifies Windows as the source of the security telemetry.
+- `EventID` specifies the event identifiers associated with log-clearing operations.
+- Event ID `104` identifies Windows event log clearing activity.
+- Event ID `1102` identifies Security audit log clearing.
+- `condition: selection` requires the event to match one of the specified Event IDs.
+- `level: high` indicates that matching activity warrants security investigation.
+
+This rule provides visibility into log-clearing activity without relying exclusively on PowerShell commands or process creation events.
+
+---
+
+#### 3. Sigma Rule Validation
+
+Chainsaw was used to validate the structure of the custom Sigma rule before executing the investigation.
+
+**Validation Command:**
+
+```powershell
+.\chainsaw.exe lint --kind sigma .\sigma-rules\windows-event-log-clearing.yml
+```
+
+The rule was used successfully in the subsequent Chainsaw investigation. The validation screenshot provides supporting evidence of the validation stage.
+
+##### Screenshot 15 Sigma Rule Validation
+
+![Screenshot 15 - Question 9 Sigma Rule Validation](screenshots/15-q9-sigma-rule-validation.png)
+
+*Figure 15: Sigma rule validation for native Windows event log clearing detection.*
+
+---
+
+#### 4. Historical EVTX Analysis Using Chainsaw
+
+After preparing the Sigma rule, Chainsaw was executed against the historical EVTX dataset provided in the CyberDefenders SigmaPredator environment.
+
+**Chainsaw Hunt Command:**
+
+```powershell
+.\chainsaw.exe hunt "..\..\..\Historical Logs" -s ".\sigma-rules\windows-event-log-clearing.yml" --mapping ".\mappings\sigma-event-logs-all.yml"
+```
+
+**Command Explanation:**
+
+- `hunt` initiates the historical event log investigation.
+- `..\..\..\Historical Logs` identifies the directory containing the EVTX files.
+- `-s` specifies the Question 9 Sigma detection rule.
+- `--mapping` provides the Sigma field-mapping configuration.
+
+Chainsaw loaded the custom detection rule and analyzed **333 historical EVTX files**, totaling approximately 75.6 MB.
+
+The analysis identified multiple event records associated with Windows Security audit log clearing.
+
+---
+
+#### 5. Investigation Results
+
+The following events were visible in the Chainsaw investigation output.
+
+| Timestamp | Event ID | Event Record ID |
+|---|---|---|
+| `2019-01-20 07:00:50` | 1102 | 32853 |
+| `2019-01-20 07:29:57` | 1102 | 32950 |
+| `2019-02-13 18:01:41` | 1102 | 227693 |
+
+**Detection Rule:** Windows Event Log Clearing Detected
+
+**Event Provider:** Microsoft-Windows-Eventlog
+
+**Earliest Matching Timestamp:** `2019-01-20 07:00:50`
+
+**Technical Finding:**
+
+Chainsaw identified multiple Windows Event ID 1102 records indicating that Security audit logs were cleared.
+
+Event ID 1102 is particularly significant because the Windows Security log contains records that can support authentication investigations, access monitoring, and incident response.
+
+Clearing these logs can interfere with forensic visibility.
+
+However, a matching event does not automatically prove malicious activity. Additional investigation is required to determine whether the log-clearing action was authorized.
+
+##### Screenshot 16 Chainsaw Detection Results
+
+The screenshot below shows the historical event log clearing detections, including the earliest matching event.
+
+![Screenshot 16 - Question 9 Chainsaw Detection Results](screenshots/16-q9-chainsaw-detection-results.png)
+
+*Figure 16: Chainsaw identified Windows Security audit log clearing events, including the earliest matching timestamp.*
+
+---
+
+#### 6. Earliest Detection Timestamp and Lab Verification
+
+Question 9 required identifying the earliest timestamp associated with Windows event log clearing.
+
+The investigation identified the following earliest matching event:
+
+**Original Event Timestamp:** `2019-01-20 07:00:50`
+
+The timestamp was formatted according to the CyberDefenders submission requirements.
+
+**Submitted and Accepted Answer:**
+
+`2019-01-20 07:00`
+
+CyberDefenders accepted this timestamp, confirming successful completion of Question 9.
+
+##### Screenshot 17 CyberDefenders Accepted Answer
+
+![Screenshot 17 - Question 9 Accepted Answer](screenshots/17-q9-accepted-answer.png)
+
+*Figure 17: CyberDefenders confirmation of the accepted earliest detection timestamp for Question 9.*
+
+---
+
+#### 7. Detection Engineering Findings
+
+The investigation demonstrated the importance of monitoring native Windows event records for potential log-clearing activity.
+
+**Key Findings:**
+
+1. Windows Event IDs 104 and 1102 provide useful indicators of event log clearing.
+2. Sigma detection rules can identify potentially suspicious Windows log-clearing events.
+3. Chainsaw successfully executed the custom rule against 333 historical EVTX files.
+4. Multiple Security audit log clearing events were identified.
+5. The earliest matching event occurred on January 20, 2019, at 07:00:50.
+6. The timestamp was successfully submitted and accepted by CyberDefenders.
+
+**Detection Limitations:**
+
+The rule relies on the presence and collection of relevant Windows event records.
+
+If event logging is disabled, events are overwritten, or telemetry is not available, the detection may not identify every log-clearing operation.
+
+The rule may also identify authorized administrative maintenance, requiring additional investigation to distinguish benign activity from malicious behavior.
+
+---
+
+#### 8. Security Recommendations
+
+Organizations should consider:
+
+- Monitoring Windows Event IDs 104 and 1102.
+- Forwarding critical security logs to centralized SIEM platforms.
+- Restricting unnecessary administrative access.
+- Investigating unexpected Security audit log clearing events.
+- Correlating event log clearing records with PowerShell and Sysmon telemetry.
+- Establishing authorized maintenance procedures.
+- Reviewing detection alerts to distinguish legitimate operations from potential defense evasion.
+
+---
+
+#### 9. Skills Demonstrated
+
+This investigation provided practical experience in:
+
+- Sigma Rule Development
+- Windows Event Log Analysis
+- Chainsaw Threat Hunting
+- Windows Security Event Monitoring
+- Detection Engineering
+- Historical EVTX Investigation
+- MITRE ATT&CK Technique Mapping
+- Security Investigation Documentation
+
+**Question 9 Status:** Completed Answer accepted by CyberDefenders.
+
+**SigmaPredator Lab:** All nine questions completed.
