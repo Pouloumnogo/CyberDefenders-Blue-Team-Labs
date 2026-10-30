@@ -619,3 +619,242 @@ This investigation provided practical experience in:
 **MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (identifier used by the SigmaPredator lab).
 
 **Question 7 Status:** Completed Answer accepted by CyberDefenders.
+
+
+### Question 8 Windows Event Log Clearing Detection Using Sysmon, Sigma, and Chainsaw
+
+**Objective:** Develop and validate a Sigma rule to detect Windows event log clearing through native Windows command-line utilities, excluding WMI, and identify the latest matching event timestamp from historical Windows event logs.
+
+#### 1. Investigation Overview
+
+This investigation focused on detecting potentially suspicious process creation activity associated with Windows event log clearing.
+
+Unlike Question 7, which examined PowerShell Script Block Logging (Event ID 4104), Question 8 focused on Windows process creation telemetry.
+
+The detection targeted the native Windows utility `wevtutil.exe`, which administrators can use to manage event logs but which attackers may abuse to remove evidence of malicious activity.
+
+**Tools and Technologies:**
+
+- Sigma Detection rule development
+- Chainsaw Rule validation and historical log analysis
+- Sysmon Process creation telemetry
+- PowerShell Command-line execution
+- Windows Event Logs (EVTX) — Historical evidence
+
+**Data Source:** Sysmon Event ID 1 Process Creation
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (SigmaPredator lab classification).
+
+---
+
+#### 2. Sigma Rule Development
+
+A custom Sigma rule was created to identify suspicious event log clearing using `wevtutil.exe`.
+
+**Rule Filename:** `process-event-log-clearing.yml`
+
+**Sigma Rule:**
+
+```yaml
+title: Suspicious Event Log Clearing via Wevtutil
+status: experimental
+description: Detects Windows event log clearing through wevtutil.exe
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  selection_image:
+    Image|endswith: '\wevtutil.exe'
+  selection_command:
+    CommandLine|contains:
+      - ' cl '
+      - ' clear-log '
+  condition: selection_image and selection_command
+
+falsepositives:
+  - Authorized administrative log clearing
+
+level: high
+```
+
+**Detection Logic Explanation:**
+
+- `logsource` specifies Windows process creation telemetry.
+- `Image|endswith` identifies the execution of `wevtutil.exe`.
+- `CommandLine|contains` checks for the `cl` or `clear-log` arguments.
+- `condition: selection_image and selection_command` requires both conditions to match.
+- `level: high` specifies the rule's detection severity.
+
+WMI-based detection was intentionally excluded in accordance with the lab requirements.
+
+The rule focuses on suspicious use of the Windows Event Utility, but additional context is required to determine whether a matching command represents malicious or authorized administrative activity.
+
+---
+
+#### 3. Sigma Rule Validation Using Chainsaw
+
+After creating the rule, it was validated using Chainsaw to verify that the detection logic could be parsed successfully.
+
+**Validation Command:**
+
+```powershell
+.\chainsaw.exe lint --kind sigma .\sigma-rules\process-event-log-clearing.yml
+```
+
+**Validation Output:**
+
+```text
+[+] Validating as sigma for supplied detection rules...
+[+] Validated 1 detection rules out of 1
+```
+
+The validation confirmed that Chainsaw successfully loaded the custom Sigma rule.
+
+##### Screenshot 12 Sigma Rule Validation
+
+The following screenshot documents the successful validation of the Question 8 Sigma rule.
+
+![Screenshot 12 - Question 8 Sigma Rule Validation](screenshots/12-q8-sigma-rule-validation.png)
+
+*Figure 12: Successful validation of the custom process creation Sigma detection rule using Chainsaw.*
+
+---
+
+#### 4. Historical EVTX Analysis
+
+After validating the Sigma rule, Chainsaw was used to search the historical Windows event log dataset.
+
+**Chainsaw Hunt Command:**
+
+```powershell
+.\chainsaw.exe hunt "..\..\..\Historical Logs" -s ".\sigma-rules\process-event-log-clearing.yml" --mapping ".\mappings\sigma-event-logs-all.yml"
+```
+
+**Command Explanation:**
+
+- `hunt` searches the historical Windows event logs for matching security activity.
+- `..\..\..\Historical Logs` specifies the historical EVTX directory.
+- `-s` loads the custom Question 8 Sigma rule.
+- `--mapping` uses the Sigma field-mapping configuration.
+
+The investigation identified a suspicious process creation event associated with the Windows Event Utility.
+
+**Detected Command:**
+
+```cmd
+wevtutil clear-log Security
+```
+
+The command targets the Windows Security event log, potentially removing valuable audit records.
+
+#### 5. Investigation Results
+
+| Attribute | Finding |
+|---|---|
+| Analysis Tool | Chainsaw |
+| Detection Rule | Suspicious Event Log Clearing via Wevtutil |
+| Data Source | Sysmon Process Creation |
+| Windows Event ID | 1 |
+| Event Record ID | 1901 |
+| Event Provider | Microsoft-Windows-Sysmon |
+| Executable | `wevtutil.exe` |
+| Detected Command | `wevtutil clear-log Security` |
+| Matching Event Timestamp | `2025-04-28 08:58:29` |
+| Accepted Latest Timestamp | `2025-04-28 08:58` |
+
+**Technical Finding:**
+
+Chainsaw identified execution of the Windows Event Utility with the `clear-log` argument targeting the Security log.
+
+The custom Sigma rule successfully detected this command through process creation telemetry.
+
+The event represents potential defense evasion because clearing security logs can remove information required for incident investigation.
+
+However, the event alone does not establish malicious intent.
+
+##### Screenshot 13 Chainsaw Detection Results
+
+The following screenshot shows the detection generated by Chainsaw, including the event timestamp, Sysmon Event ID, and matching command.
+
+![Screenshot 13 - Question 8 Chainsaw Detection Results](screenshots/13-q8-chainsaw-detection-results.png)
+
+*Figure 13: Chainsaw detected suspicious Windows event log clearing activity through wevtutil.exe.*
+
+---
+
+#### 6. Latest Detection Timestamp and Lab Verification
+
+Question 8 required determining the timestamp of the latest matching process creation event.
+
+**Matching Event Timestamp:** `2025-04-28 08:58:29`
+
+The timestamp was formatted according to the CyberDefenders submission requirements.
+
+**Submitted and Accepted Answer:**
+
+`2025-04-28 08:58`
+
+CyberDefenders accepted the answer, confirming successful completion of Question 8.
+
+##### Screenshot 14 CyberDefenders Accepted Answer
+
+The screenshot below documents the accepted Question 8 answer.
+
+![Screenshot 14 - Question 8 Accepted Answer](screenshots/14-q8-accepted-answer.png)
+
+*Figure 14: CyberDefenders confirmation of the accepted latest detection timestamp for Question 8.*
+
+---
+
+#### 7. Detection Engineering Findings
+
+The investigation demonstrated the effectiveness of monitoring Windows process creation events for suspicious event log clearing activity.
+
+**Key Findings:**
+
+1. Sysmon Event ID 1 provides valuable process execution telemetry.
+2. `wevtutil.exe` is a legitimate Windows utility that attackers may abuse to clear event logs.
+3. The custom Sigma rule was successfully validated using Chainsaw.
+4. The detection identified a process executing `wevtutil clear-log Security`.
+5. The matching event timestamp was identified and successfully submitted to CyberDefenders.
+6. Monitoring process creation activity provides detection coverage beyond PowerShell Script Block Logging.
+
+**Detection Limitations:**
+
+The custom rule focuses specifically on `wevtutil.exe` and selected command-line arguments. It does not detect every possible method of clearing Windows event logs.
+
+It also requires relevant process creation telemetry to be collected and available for analysis.
+
+---
+
+#### 8. Security Recommendations
+
+Organizations should consider implementing the following security controls:
+
+- Enable Sysmon process creation monitoring on relevant Windows endpoints.
+- Collect and forward process creation logs to a centralized SIEM.
+- Monitor suspicious execution of `wevtutil.exe` with log-clearing arguments.
+- Correlate process creation detections with Windows Event IDs 104 and 1102.
+- Investigate unexpected Security event log clearing activity.
+- Apply least-privilege access controls to administrative accounts.
+- Establish baselines for authorized event log maintenance activities.
+
+---
+
+#### 9. Skills Demonstrated
+
+This investigation provided hands-on experience in:
+
+- Sigma Rule Development
+- Windows Process Creation Monitoring
+- Sysmon Event Analysis
+- Chainsaw Detection Validation
+- Windows Event Log Investigation
+- Detection Engineering
+- MITRE ATT&CK Technique Mapping
+- Cybersecurity Investigation Documentation
+
+**Question 8 Status:** Completed Answer accepted by CyberDefenders.
