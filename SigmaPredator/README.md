@@ -164,8 +164,86 @@ Detection engineers should combine PowerShell telemetry with process creation ev
 
 #### Screenshot Evidence
 
+### Question 4 PowerShell Cmdlets for Windows Event Log Clearing
+
+**Objective:** Identify built-in PowerShell cmdlets that can be used to clear or remove Windows event logs and understand their significance in cybersecurity detection engineering.
+
+**Identified PowerShell Cmdlets:**
+- `Clear-EventLog`
+- `Remove-EventLog`
+
+#### Technical Explanation
+
+PowerShell provides legitimate administrative commands for managing Windows event logs. However, attackers can abuse these capabilities to remove evidence of unauthorized activity and interfere with security investigations.
+
+**1. Clear-EventLog**
+
+The `Clear-EventLog` cmdlet clears entries from specified classic Windows event logs without deleting the log itself.
+
+Example:
+
+```powershell
+Clear-EventLog -LogName Application
+```
+
+This command clears entries from the Windows Application event log.
+
+**2. Remove-EventLog**
+
+The `Remove-EventLog` cmdlet removes specified classic Windows event logs or unregisters event sources, depending on the parameters supplied.
+
+Example:
+
+```powershell
+Remove-EventLog -LogName MyCustomLog
+```
+
+This command removes a specified custom event log. Unlike `Clear-EventLog`, the purpose is not simply to empty existing entries.
+
+#### Security Implications
+
+Attackers may abuse PowerShell event log management commands to:
+
+- Remove evidence of suspicious activities.
+- Reduce the visibility available to security monitoring systems.
+- Complicate incident response and forensic investigations.
+- Conceal portions of an attacker's activity.
+
+These actions can indicate defense evasion, although authorized administrators may also perform legitimate event log maintenance.
+
+#### Detection Engineering Approach
+
+As a Detection Engineer, I investigated PowerShell commands associated with event log manipulation.
+
+Potential detection indicators include:
+
+- Execution of `Clear-EventLog`.
+- Execution of `Remove-EventLog`.
+- Suspicious PowerShell script blocks recorded under Event ID 4104.
+- Unusual administrative activity involving event log management.
+
+Sigma detection rules can use these indicators to identify potentially malicious PowerShell activity.
+
+#### Key Findings
+
+Both `Clear-EventLog` and `Remove-EventLog` can affect the availability of Windows event log evidence.
+
+Monitoring these commands through PowerShell Script Block Logging, alongside process creation and native Windows event telemetry, can improve detection coverage.
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (SigmaPredator lab classification).
+
+#### Screenshot Evidence Question 4
+
+The following screenshot documents the successful identification of the PowerShell cmdlets associated with Windows event log clearing.
+
+![Question 4 - PowerShell Event Log Clearing Cmdlets](screenshots/05-powershell-cmdlets.png)
+
+*Figure 4: CyberDefenders SigmaPredator Identification of Clear-EventLog and Remove-EventLog PowerShell cmdlets.*
+
 The screenshot below documents Question 3 of the SigmaPredator Detection Engineering investigation.
 
 ![Question 3 - PowerShell Script Block Logging Detection](screenshots/04-powershell-script-block-logging.png)
 
 *Figure 3: Investigation of PowerShell Script Block Logging and Windows Event ID 4104 during the SigmaPredator lab.*
+
+
