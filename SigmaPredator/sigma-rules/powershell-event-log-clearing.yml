@@ -1,0 +1,21 @@
+
+title: Suspicious PowerShell Event Log Clearing
+status: experimental
+description: Detects PowerShell cmdlets associated with clearing Windows event logs.
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+  category: ps_script
+
+detection:
+  selection:
+    ScriptBlockText|contains:
+      - 'Clear-EventLog'
+      - 'Remove-EventLog'
+  condition: selection
+
+falsepositives:
+  - Authorized administrative event log maintenance
+
+level: high
