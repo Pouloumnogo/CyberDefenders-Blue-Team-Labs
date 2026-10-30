@@ -97,12 +97,75 @@ Security engineers can monitor Windows process creation events for suspicious co
 
 WMI-based event log clearing represents an alternative method to using `wevtutil.exe`. Effective detection engineering requires monitoring multiple techniques attackers may use to remove evidence.
 
-**MITRE ATT&CK:** T1070.001 — Clear Windows Event Logs (lab classification).
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (lab classification).
 
-### Screenshot Evidence — Question 2
+### Screenshot Evidence Question 2
 
 The following screenshot documents the WMI Process Creation Detection investigation conducted during the SigmaPredator lab.
 
 ![Question 2 - WMI Process Creation Detection](screenshots/03-wmi-process-creation.png)
 
 *Figure 2: SigmaPredator Question 2 WMI Process Creation Detection.*
+
+
+### Question 3 PowerShell Script Block Logging Detection
+
+**Objective:** Identify the PowerShell logging mechanism and Windows Event ID used to monitor suspicious PowerShell execution associated with Windows event log clearing.
+
+**Logging Feature:** PowerShell Script Block Logging
+
+**Windows Event Channel:** `Microsoft-Windows-PowerShell/Operational`
+
+**Event ID:** `4104`
+
+#### Technical Explanation
+
+PowerShell Script Block Logging is a Windows security logging feature that records the content of PowerShell scripts and commands during execution.
+
+When Script Block Logging is enabled, Windows generates Event ID 4104 in the `Microsoft-Windows-PowerShell/Operational` event channel.
+
+This provides security analysts with visibility into PowerShell activity and helps identify suspicious commands that attackers may execute to clear Windows event logs.
+
+#### Example of Suspicious Activity
+
+```powershell
+Clear-EventLog -LogName Application
+```
+
+This command clears entries from the Windows Application event log.
+
+Although this functionality can be used for legitimate administrative purposes, attackers may abuse it to remove evidence of malicious activity.
+
+#### Detection Engineering Approach
+
+Security engineers can develop Sigma rules to analyze PowerShell Script Block Logging events for suspicious commands associated with event log manipulation.
+
+Relevant indicators include:
+
+- `Clear-EventLog` Clears entries from specified Windows event logs.
+- `Remove-EventLog` Deletes specified classic Windows event logs or unregisters event sources.
+- `EventLogSession.ClearLog()` A .NET method that can clear Windows event logs.
+
+Monitoring Event ID 4104 allows security teams to identify potentially suspicious PowerShell code and investigate whether the activity was authorized.
+
+#### Security Implications
+
+Attackers may attempt to clear Windows event logs to reduce forensic visibility and conceal unauthorized activities.
+
+PowerShell Script Block Logging provides an additional detection opportunity beyond monitoring process creation events alone.
+
+#### Key Findings
+
+PowerShell Script Block Logging and Event ID 4104 provide important visibility into PowerShell-based event log manipulation.
+
+Detection engineers should combine PowerShell telemetry with process creation events and Windows event log clearing indicators to improve detection coverage and reduce reliance on a single data source.
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (classification used in the SigmaPredator lab).
+
+#### Screenshot Evidence
+
+The screenshot below documents Question 3 of the SigmaPredator Detection Engineering investigation.
+
+![Question 3 - PowerShell Script Block Logging Detection](screenshots/04-powershell-script-block-logging.png)
+
+*Figure 3: Investigation of PowerShell Script Block Logging and Windows Event ID 4104 during the SigmaPredator lab.*
