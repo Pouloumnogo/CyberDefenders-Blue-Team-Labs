@@ -643,7 +643,7 @@ The detection targeted the native Windows utility `wevtutil.exe`, which administ
 - Chainsaw Rule validation and historical log analysis
 - Sysmon Process creation telemetry
 - PowerShell Command-line execution
-- Windows Event Logs (EVTX) — Historical evidence
+- Windows Event Logs (EVTX) Historical evidence
 
 **Data Source:** Sysmon Event ID 1 Process Creation
 
@@ -866,6 +866,8 @@ This investigation provided hands-on experience in:
 
 ### Question 9 Windows Event Log Clearing Detection Using Sigma and Chainsaw
 
+[View Question 9 Sigma Detection Rule](sigma-rules/question-09-event-log-clearing/windows-event-log-clearing.yml)
+
 **Objective:** Develop and validate a Sigma detection rule to identify Windows event log clearing activity using native Windows event records and determine the earliest matching timestamp from historical EVTX logs.
 
 #### 1. Investigation Overview
@@ -878,11 +880,11 @@ These events can provide valuable evidence of potential defense evasion.
 
 **Tools and Technologies:**
 
-- Sigma — Detection rule development
-- Chainsaw — Sigma rule validation and historical EVTX analysis
-- Windows Event Logs — Security and System event monitoring
-- PowerShell — Execution of analysis commands
-- MITRE ATT&CK — Adversary technique research
+- Sigma Detection rule development
+- Chainsaw Sigma rule validation and historical EVTX analysis
+- Windows Event Logs Security and System event monitoring
+- PowerShell Execution of analysis commands
+- MITRE ATT&CK Adversary technique research
 
 **Relevant Windows Event IDs:**
 
@@ -891,7 +893,7 @@ These events can provide valuable evidence of potential defense evasion.
 | 104 | A Windows event log was cleared |
 | 1102 | The Security audit log was cleared |
 
-**MITRE ATT&CK:** T1070.001 — Clear Windows Event Logs (identifier used in the SigmaPredator lab).
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (identifier used in the SigmaPredator lab).
 
 ---
 
