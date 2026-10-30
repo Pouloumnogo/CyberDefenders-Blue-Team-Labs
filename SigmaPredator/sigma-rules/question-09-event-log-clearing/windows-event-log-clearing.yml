@@ -1,0 +1,19 @@
+title: Windows Event Log Clearing Detected
+status: experimental
+description: Detects native Windows events indicating event log clearing.
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+
+detection:
+  selection:
+    EventID:
+      - 104
+      - 1102
+  condition: selection
+
+falsepositives:
+  - Authorized administrative log maintenance
+
+level: high
