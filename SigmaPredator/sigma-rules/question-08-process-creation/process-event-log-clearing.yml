@@ -1,0 +1,23 @@
+
+title: Suspicious Event Log Clearing via Wevtutil
+status: experimental
+description: Detects Windows event log clearing through wevtutil.exe
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+  category: process_creation
+
+detection:
+  selection_image:
+    Image|endswith: '\wevtutil.exe'
+  selection_command:
+    CommandLine|contains:
+      - ' cl '
+      - ' clear-log '
+  condition: selection_image and selection_command
+
+falsepositives:
+  - Authorized administrative log clearing
+
+level: high
