@@ -625,6 +625,8 @@ This investigation provided practical experience in:
 
 ### Question 8 Windows Event Log Clearing Detection Using Sysmon, Sigma, and Chainsaw
 
+[View Question 8 Sigma Detection Rule](sigma-rules/question-08-process-creation/process-event-log-clearing.yml)
+
 **Objective:** Develop and validate a Sigma rule to detect Windows event log clearing through native Windows command-line utilities, excluding WMI, and identify the latest matching event timestamp from historical Windows event logs.
 
 #### 1. Investigation Overview
