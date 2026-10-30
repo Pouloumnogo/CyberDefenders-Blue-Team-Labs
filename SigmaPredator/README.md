@@ -312,3 +312,67 @@ The following screenshot documents the identification of .NET API methods associ
 *Figure 5: CyberDefenders SigmaPredator Research into .NET API methods used for Windows event log clearing.*
 
 
+### Question 6 Windows Event IDs for Event Log Clearing Detection
+
+**Objective:** Identify Windows Event IDs associated with clearing System and Security event logs and explain their importance in detecting potential defense evasion.
+
+**Identified Event IDs:**
+- **Event ID 104** Windows event log clearing
+- **Event ID 1102** Security audit log clearing
+
+#### Technical Explanation
+
+Windows Event Logs record important operating system activities, including authentication events, application activities, system changes, and security-related operations.
+
+When event logs are cleared, Windows can generate specific event records indicating that a log-clearing operation occurred.
+
+**1. Event ID 104 Event Log Cleared**
+
+- Event provider: Microsoft-Windows-Eventlog
+- Commonly recorded in the System event channel
+- Indicates that a Windows event log was cleared
+
+This event can provide evidence of event log clearing even after previous entries have been removed.
+
+**2. Event ID 1102 Security Audit Log Cleared**
+
+- Event provider: Microsoft-Windows-Eventlog
+- Recorded in the Security event channel
+- Indicates that the Windows Security audit log was cleared
+
+This event is particularly important because the Security log contains valuable records of authentication and security-related activities.
+
+#### Security Implications
+
+Attackers may clear Windows event logs to hide unauthorized access, malicious commands, or other suspicious activity.
+
+Monitoring Events 104 and 1102 helps security teams identify potential attempts to remove investigative evidence.
+
+However, log clearing can also occur during legitimate administrative maintenance. Analysts must evaluate the context before concluding that an attack occurred.
+
+#### Detection Engineering Approach
+
+As a Detection Engineer, I identified the following monitoring opportunities:
+
+- Monitor Event ID 104 for Windows event log clearing activity.
+- Monitor Event ID 1102 for Security audit log clearing.
+- Correlate these events with suspicious PowerShell commands, WMIC activity, and `wevtutil.exe` execution.
+- Investigate the associated user account, affected system, timestamp, and related process activity.
+
+Sigma detection rules can use these Windows event records to generate alerts for potentially suspicious log-clearing behavior.
+
+#### Key Findings
+
+Event IDs 104 and 1102 provide important evidence of Windows event log clearing.
+
+Combining native Windows event log telemetry with PowerShell Script Block Logging and process creation monitoring can improve detection coverage.
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (lab classification; subsequently T1685.005).
+
+#### Screenshot Evidence Question 6
+
+The following screenshot documents the identification of Windows Event IDs associated with event log clearing.
+
+![Question 6 - Windows Event Log Clearing Event IDs](screenshots/07-windows-event-log-clearing-event-ids.png)
+
+*Figure 6: CyberDefenders SigmaPredator Identification of Windows Event IDs 104 and 1102 for log clearing detection.*
