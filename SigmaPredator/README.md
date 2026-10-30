@@ -58,3 +58,51 @@ To be completed after validating the detection rules.
 The native Windows utility `wevtutil.exe` can be used to manage and clear event logs. Monitoring its execution helps identify suspicious log-clearing activity.
 
 ![Process Creation Detection](screenshots/02-wevtutil-process-creation.png)
+
+
+### Question 2 WMI-Based Windows Event Log Clearing Detection
+
+**Objective:** Identify the WMI component associated with clearing Windows event logs and understand how attackers can abuse it to remove security evidence.
+
+**Technical Explanation:**
+
+Windows Management Instrumentation (WMI) is a Microsoft technology that enables administrators to manage and monitor Windows operating systems.
+
+Windows Management Instrumentation Command-line (WMIC) provides command-line access to WMI functionality.
+
+The `nteventlog` WMIC alias maps to the `Win32_NTEventLogFile` WMI class, which provides functionality for managing Windows event logs.
+
+**Example Command:**
+
+```cmd
+wmic nteventlog where "LogFileName='Security'" call ClearEventLog
+```
+
+This command demonstrates how the Windows Security event log can be cleared using WMI.
+
+**Security Implications:**
+
+Attackers may abuse legitimate Windows management tools to clear event logs, remove evidence of unauthorized activity, and complicate security investigations.
+
+**Detection Engineering Approach:**
+
+Security engineers can monitor Windows process creation events for suspicious commands containing:
+
+- `wmic.exe`
+- `nteventlog`
+- `ClearEventLog`
+- References to Security, System, or Application event logs
+
+**Key Finding:**
+
+WMI-based event log clearing represents an alternative method to using `wevtutil.exe`. Effective detection engineering requires monitoring multiple techniques attackers may use to remove evidence.
+
+**MITRE ATT&CK:** T1070.001 — Clear Windows Event Logs (lab classification).
+
+### Screenshot Evidence — Question 2
+
+The following screenshot documents the WMI Process Creation Detection investigation conducted during the SigmaPredator lab.
+
+![Question 2 - WMI Process Creation Detection](screenshots/03-wmi-process-creation.png)
+
+*Figure 2: SigmaPredator Question 2 WMI Process Creation Detection.*
