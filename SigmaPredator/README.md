@@ -376,3 +376,246 @@ The following screenshot documents the identification of Windows Event IDs assoc
 ![Question 6 - Windows Event Log Clearing Event IDs](screenshots/07-windows-event-log-clearing-event-ids.png)
 
 *Figure 6: CyberDefenders SigmaPredator Identification of Windows Event IDs 104 and 1102 for log clearing detection.*
+
+
+## Phase 2 Sigma Rule Development and Validation
+
+### Question 7 PowerShell Event Log Clearing Detection Using Sigma and Chainsaw
+
+**Objective:** Develop, validate, and execute a Sigma detection rule to identify suspicious PowerShell-based Windows event log clearing activity and determine the earliest matching event timestamp from historical Windows event logs.
+
+### 1. Investigation Environment and Historical Logs
+
+The investigation was conducted in the CyberDefenders SigmaPredator virtual machine using Chainsaw, Sigma, and Windows Event Log (EVTX) files.
+
+The provided historical dataset contained **333 EVTX files**, which were examined to identify suspicious PowerShell activity associated with event log clearing.
+
+**Tools Used:**
+- Chainsaw Windows event log analysis and detection validation.
+- Sigma Detection rule development.
+- PowerShell Command execution and analysis.
+- Windows EVTX Logs Historical security event evidence.
+- MITRE ATT&CK Adversary technique reference.
+
+**Historical Log Location:**
+
+`Start Here/Historical Logs`
+
+#### Screenshot 08 Historical Windows Event Logs
+
+The screenshot below shows the historical EVTX dataset used for the investigation.
+
+![Screenshot 08 - Historical Windows Event Logs](screenshots/08-historical-logs-directory.png)
+
+*Figure 8: Historical Windows EVTX files provided in the SigmaPredator laboratory environment.*
+
+---
+
+### 2. Sigma Detection Rule Development
+
+The objective was to identify suspicious PowerShell commands used to clear Windows event logs.
+
+The detection focused on two PowerShell cmdlets:
+
+- `Clear-EventLog`
+- `Remove-EventLog`
+
+Because the lab specified that PowerShell was operating in Constrained Language Mode, .NET-based detection methods were excluded from this rule.
+
+**Sigma Rule Filename:** `powershell-event-log-clearing.yml`
+
+**Sigma Detection Rule:**
+
+```yaml
+title: Suspicious PowerShell Event Log Clearing
+status: experimental
+description: Detects PowerShell cmdlets associated with clearing Windows event logs.
+author: SigmaPredator Lab
+
+logsource:
+  product: windows
+  category: ps_script
+
+detection:
+  selection:
+    ScriptBlockText|contains:
+      - 'Clear-EventLog'
+      - 'Remove-EventLog'
+  condition: selection
+
+falsepositives:
+  - Authorized administrative event log maintenance
+
+level: high
+```
+
+**Detection Logic Explanation:**
+
+- `title` identifies the detection rule.
+- `logsource` specifies Windows PowerShell script block telemetry.
+- `ScriptBlockText` represents the PowerShell script content to inspect.
+- `contains` searches for either specified event log management cmdlet.
+- `condition: selection` requires the selection criteria to match.
+- `level: high` assigns a high severity to the detection.
+
+The rule is intended to detect potentially suspicious event log clearing commands, but matching activity requires further investigation to establish whether it was malicious.
+
+---
+
+### 3. Sigma Rule Validation Using Chainsaw
+
+Before testing the rule against the historical dataset, Chainsaw was used to validate the Sigma rule structure.
+
+**Validation Command:**
+
+```powershell
+.\chainsaw.exe lint --kind sigma .\sigma-rules\
+```
+
+**Validation Output:**
+
+```text
+[+] Validating as sigma for supplied detection rules...
+[+] Validated 1 detection rules out of 1
+```
+
+The validation confirmed that Chainsaw successfully parsed the Sigma rule without reporting structural errors.
+
+#### Screenshot 09 Successful Sigma Rule Validation
+
+The screenshot below demonstrates successful rule validation through Chainsaw.
+
+![Screenshot 09 - Sigma Rule Validation](screenshots/09-q7-sigma-rule-validation.png)
+
+*Figure 9: Chainsaw successfully validated the PowerShell event log clearing Sigma detection rule.*
+
+---
+
+### 4. Historical EVTX Analysis Using Chainsaw
+
+After validating the rule, Chainsaw was executed against the historical Windows Event Log dataset.
+
+**Chainsaw Hunt Command:**
+
+```powershell
+.\chainsaw.exe hunt "..\..\..\Historical Logs" -s ".\sigma-rules" --mapping ".\mappings\sigma-event-logs-all.yml"
+```
+
+**Command Explanation:**
+
+- `hunt` searches the historical Windows event logs for suspicious activity.
+- `..\..\..\Historical Logs` specifies the directory containing the EVTX dataset.
+- `-s` specifies the custom Sigma rule directory.
+- `--mapping` specifies the Sigma field-mapping configuration.
+
+Chainsaw scanned the **333 historical EVTX files** and identified one event matching the custom detection rule.
+
+#### Investigation Results
+
+| Attribute | Result |
+|---|---|
+| Analysis Tool | Chainsaw |
+| Detection Rule | Suspicious PowerShell Event Log Clearing |
+| Historical EVTX Files | 333 |
+| Matching Detections | 1 |
+| Event Provider | Microsoft-Windows-PowerShell |
+| Event ID | 4104 |
+| Event Record ID | 4460 |
+| Suspicious Command | `Clear-EventLog -LogName application, system -confirm` |
+| Earliest Matching Timestamp | `2021-10-25 18:04:24` |
+
+**Technical Finding:**
+
+Chainsaw identified a PowerShell script block containing the `Clear-EventLog` cmdlet.
+
+The command targeted the Windows Application and System event logs and therefore represented potential event log clearing activity.
+
+This detection illustrates how PowerShell Script Block Logging can help security analysts identify potentially suspicious administrative commands.
+
+#### Screenshot 10 Chainsaw Detection Results
+
+The screenshot below shows the actual Chainsaw detection output, including the matching event and its timestamp.
+
+![Screenshot 10 - Chainsaw Detection Results](screenshots/10-q7-chainsaw-detection-results.png)
+
+*Figure 10: Chainsaw identified a matching PowerShell event log clearing command in the historical EVTX dataset.*
+
+---
+
+### 5. Earliest Detection Timestamp and Lab Verification
+
+Question 7 required identifying the timestamp of the earliest event detected by the custom Sigma rule.
+
+The Chainsaw investigation identified one matching event.
+
+**Earliest Detection Timestamp:** `2021-10-25 18:04:24`
+
+The timestamp was formatted according to the CyberDefenders question requirements.
+
+**Submitted and Accepted Answer:**
+
+`2021-10-25 18:04`
+
+CyberDefenders accepted the submitted timestamp, confirming successful completion of Question 7.
+
+#### Screenshot 11 CyberDefenders Accepted Answer
+
+The screenshot below documents the accepted response for Question 7.
+
+![Screenshot 11 - CyberDefenders Accepted Answer](screenshots/11-q7-accepted-answer.png)
+
+*Figure 11: CyberDefenders confirmation of the accepted earliest detection timestamp for Question 7.*
+
+---
+
+### 6. Detection Engineering Findings
+
+The investigation demonstrated how Sigma detection rules can be developed and validated against historical Windows event logs.
+
+**Key Findings:**
+
+1. PowerShell Script Block Logging provides useful visibility into event log clearing commands.
+2. Sigma rules can detect suspicious PowerShell activity by inspecting script block content.
+3. Chainsaw successfully validated the custom detection rule.
+4. Analysis of 333 historical EVTX files produced one matching event.
+5. The suspicious activity was associated with Windows Event ID 4104.
+6. The earliest matching event timestamp was identified and successfully submitted to CyberDefenders.
+
+**Detection Limitations:**
+
+The custom rule focuses on `Clear-EventLog` and `Remove-EventLog`. It does not cover every possible event log clearing method.
+
+Additionally, an event matching the rule is not automatically proof of malicious activity. Authorized administrative maintenance could produce similar results.
+
+---
+
+### 7. Security Recommendations
+
+Based on the investigation, organizations should consider implementing the following security practices:
+
+- Enable PowerShell Script Block Logging on applicable Windows systems.
+- Monitor suspicious use of `Clear-EventLog` and `Remove-EventLog`.
+- Forward security logs to a centralized SIEM platform.
+- Monitor Windows Event IDs 104 and 1102 for event log clearing.
+- Correlate PowerShell activity with process creation and administrative account activity.
+- Investigate unexpected event log clearing on critical systems.
+- Apply least-privilege access controls to reduce unauthorized administrative activity.
+
+---
+
+### 8. Skills Demonstrated
+
+This investigation provided practical experience in:
+
+- Detection Engineering
+- Sigma Rule Development
+- Chainsaw Threat Hunting
+- PowerShell Script Block Logging
+- Windows Event Log Analysis
+- Security Event Correlation
+- MITRE ATT&CK Technique Research
+- Detection Validation and Documentation
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (identifier used by the SigmaPredator lab).
+
+**Question 7 Status:** Completed Answer accepted by CyberDefenders.
