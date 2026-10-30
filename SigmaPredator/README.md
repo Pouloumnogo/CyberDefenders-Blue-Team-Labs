@@ -164,6 +164,13 @@ Detection engineers should combine PowerShell telemetry with process creation ev
 
 #### Screenshot Evidence
 
+The screenshot below documents Question 3 of the SigmaPredator Detection Engineering investigation.
+
+![Question 3 - PowerShell Script Block Logging Detection](screenshots/04-powershell-script-block-logging.png)
+
+*Figure 3: Investigation of PowerShell Script Block Logging and Windows Event ID 4104 during the SigmaPredator lab.*
+
+
 ### Question 4 PowerShell Cmdlets for Windows Event Log Clearing
 
 **Objective:** Identify built-in PowerShell cmdlets that can be used to clear or remove Windows event logs and understand their significance in cybersecurity detection engineering.
@@ -240,10 +247,68 @@ The following screenshot documents the successful identification of the PowerShe
 
 *Figure 4: CyberDefenders SigmaPredator Identification of Clear-EventLog and Remove-EventLog PowerShell cmdlets.*
 
-The screenshot below documents Question 3 of the SigmaPredator Detection Engineering investigation.
 
-![Question 3 - PowerShell Script Block Logging Detection](screenshots/04-powershell-script-block-logging.png)
+### Question 5 .NET API Methods for Windows Event Log Clearing
 
-*Figure 3: Investigation of PowerShell Script Block Logging and Windows Event ID 4104 during the SigmaPredator lab.*
+**Objective:** Identify native .NET API methods that can be invoked through PowerShell to clear Windows event logs and understand how to detect their misuse.
+
+**Identified .NET Methods:**
+- `EventLogSession.ClearLog`
+- `EventLog.Clear`
+
+#### Technical Explanation
+
+The Microsoft .NET framework provides APIs that allow applications and PowerShell scripts to interact with Windows operating system components.
+
+Two important methods associated with Windows event log clearing are:
+
+**1. EventLogSession.ClearLog**
+
+- Namespace: `System.Diagnostics.Eventing.Reader`
+- Class: `EventLogSession`
+- Method: `ClearLog()`
+
+This method allows a program to clear events from a specified Windows event log.
+
+**2. EventLog.Clear**
+
+- Namespace: `System.Diagnostics`
+- Class: `EventLog`
+- Method: `Clear()`
+
+This method removes entries from an event log associated with an EventLog object.
+
+#### Security Implications
+
+Attackers may invoke these methods through PowerShell or other .NET applications to remove security evidence and interfere with forensic investigations.
+
+Unlike traditional command-line approaches, .NET-based execution may avoid detection rules focused exclusively on `wevtutil.exe`, WMIC, or specific PowerShell cmdlets.
+
+#### Detection Engineering Approach
+
+Security engineers can monitor PowerShell Script Block Logging events, particularly Event ID 4104, for references to:
+
+- `EventLogSession`
+- `ClearLog`
+- `System.Diagnostics.EventLog`
+- `.Clear()`
+
+Detection logic should correlate these indicators with process activity, user privileges, and relevant Windows log-clearing events to reduce false positives.
+
+#### Key Findings
+
+Windows event logs can be cleared through multiple interfaces, including command-line utilities, PowerShell cmdlets, WMI, and .NET APIs.
+
+Effective detection engineering requires visibility into these different execution methods rather than relying on a single indicator.
+
+**MITRE ATT&CK:** T1070.001 Clear Windows Event Logs (lab classification).
+
+#### Screenshot Evidence Question 5
+
+The following screenshot documents the identification of .NET API methods associated with Windows event log clearing.
+
+![Question 5 - .NET API Event Log Clearing Detection](screenshots/06-dotnet-api-event-log-clearing.png)
+
+*Figure 5: CyberDefenders SigmaPredator Research into .NET API methods used for Windows event log clearing.*
 
 
