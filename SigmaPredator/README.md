@@ -382,6 +382,8 @@ The following screenshot documents the identification of Windows Event IDs assoc
 
 ### Question 7 PowerShell Event Log Clearing Detection Using Sigma and Chainsaw
 
+[View Question 7 Sigma Detection Rule](sigma-rules/powershell-event-log-clearing.yml)
+
 **Objective:** Develop, validate, and execute a Sigma detection rule to identify suspicious PowerShell-based Windows event log clearing activity and determine the earliest matching event timestamp from historical Windows event logs.
 
 ### 1. Investigation Environment and Historical Logs
