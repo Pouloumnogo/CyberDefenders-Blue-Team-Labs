@@ -45,3 +45,16 @@ Screenshots and detection results will be added throughout the investigation.
 ## Key Findings
 
 To be completed after validating the detection rules.
+
+
+## Lab Scenario
+
+![SigmaPredator Lab Scenario](screenshots/01-lab-scenario.png)
+
+## Technique Research
+
+### Question 1 Process Creation Detection
+
+The native Windows utility `wevtutil.exe` can be used to manage and clear event logs. Monitoring its execution helps identify suspicious log-clearing activity.
+
+![Process Creation Detection](screenshots/02-wevtutil-process-creation.png)
